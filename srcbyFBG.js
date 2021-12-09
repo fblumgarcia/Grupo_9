@@ -1,75 +1,94 @@
-/*const calcularDepreciacionNIIF = (precioInicial,
-    precioFinal,
-    vidaUtil,
-    numeroPeriodoAconsultar) => {
-        if (vidaUtil<=0){
-           precioDepreciado=0;
-        }
-        else if (vidaUtil<numeroPeriodoAconsultar){
-           precioDepreciado=precioFinal;
-        }
-        else{
-            var precioAdepreciar=precioInicial-precioFinal;
-            var depreciacionAnual=precioAdepreciar/vidaUtil;
-            precioDepreciado=precioInicial-(depreciacionAnual*numeroPeriodoAconsultar);}
-        //console.log(precioDepreciado);
-        return precioDepreciado;
+const calcularDepreciacionNIIF = (precioInicial,
+  precioFinal,
+  vidaUtil,
+  numeroPeriodoAconsultar) => {
+    if (vidaUtil<=0){
+      precioDepreciado=0;
     }
+    else if (vidaUtil<numeroPeriodoAconsultar){
+      precioDepreciado=precioFinal;
+    }
+    else{
+      var precioAdepreciar=precioInicial-precioFinal;
+      var depreciacionAnual=precioAdepreciar/vidaUtil;
+      precioDepreciado=precioInicial-(depreciacionAnual*numeroPeriodoAconsultar);}
+      //console.log(precioDepreciado);
+      return precioDepreciado;
+}
     
 const calcularDepreciacionNIIFEnDolares = (precioInicial,
-        precioFinal,
-        vidaUtil,
-        numeroPeriodoAconsultar) => {
-        if(precioInicial<=0){
-            throw "Error";
-        }
-        else{
-            calcularDepreciacionNIIF(precioInicial,precioFinal,vidaUtil,numeroPeriodoAconsultar);            
-            precioDepreciadoDolares= precioDepreciado/3778;}
-            //console.log(precioDepreciadoDolares);
-        return precioDepreciadoDolares;
+  precioFinal,
+  vidaUtil,
+  numeroPeriodoAconsultar) => {
+  if(precioInicial<=0){
+    throw "Error";
+  }
+  else{
+    calcularDepreciacionNIIF(precioInicial,precioFinal,vidaUtil,numeroPeriodoAconsultar);            
+    precioDepreciadoDolares= precioDepreciado/3778;}
+    //console.log(precioDepreciadoDolares);
+  return precioDepreciadoDolares;
 }
 async function mostrarProductos(){
-    let response=await fetch("https://misiontic2022upb.vercel.app/api/logistics/products");
-    let productosAPI=await response.json();
-    let productosConDepreciacion=new Array();
-    let productoDepreciado=new Array();
-    for(i=0;i<productosAPI.length;i++){
-        productoDepreciado.push(calcularDepreciacionNIIF(productosAPI[i].precioInicial,
-            productosAPI[i].precioFinal,
-            productosAPI[i].vidaUtil,
-            productosAPI[i].periodo_consultado));
-    }
-    for(i=0;i<productosAPI.length;i++){
-        productosConDepreciacion.push({precioDepreciado:productoDepreciado[i],
-            precioInicial:productosAPI[i].precioInicial,precioFinal:productosAPI[i].precioFinal,
-            vidaUtil:productosAPI[i].vidaUtil,periodo_consultado:productosAPI[i].periodo_consultado});
-    }
-    //console.log(productosConDepreciacion);
-    return productosConDepreciacion;
+  let response=await fetch("https://misiontic2022upb.vercel.app/api/logistics/products");
+  let productosAPI=await response.json();
+  let productosConDepreciacion=new Array();
+  let productoDepreciado=new Array();
+  for(i=0;i<productosAPI.length;i++){
+    productoDepreciado.push(calcularDepreciacionNIIF(productosAPI[i].precioInicial,
+    productosAPI[i].precioFinal,
+    productosAPI[i].vidaUtil,
+    productosAPI[i].periodo_consultado));
+  }
+  for(i=0;i<productosAPI.length;i++){
+    productosConDepreciacion.push({precioDepreciado:productoDepreciado[i],
+    precioInicial:productosAPI[i].precioInicial,precioFinal:productosAPI[i].precioFinal,
+    vidaUtil:productosAPI[i].vidaUtil,periodo_consultado:productosAPI[i].periodo_consultado});
+  }
+  //console.log(productosConDepreciacion);
+  return productosConDepreciacion;
 }
 async function mostrarProductosPrecioDolares(){
-    let response=await fetch(
-       "https://misiontic2022upb.vercel.app/api/logistics/products");
-    let productosAPI=await response.json();
-    let productosConDepreciacion=new Array();
-    let productoDepreciado=new Array();
-    for(i=0;i<productosAPI.length;i++){
-        const precD=calcularDepreciacionNIIF(productosAPI[i].precioInicial,productosAPI[i].precioFinal,productosAPI[i].vidaUtil,productosAPI[i].periodo_consultado);
-        var precioDolar=await fetch("https://misiontic2022upb.vercel.app/api/logistics/to-dolar-converter/"+precD);
-        let respuesta=await precioDolar.json();
-        productoDepreciado.push(respuesta);
+  let response=await fetch(
+      "https://misiontic2022upb.vercel.app/api/logistics/products");
+  let productosAPI=await response.json();
+  let productosConDepreciacion=new Array();
+  let productoDepreciado=new Array();
+  for(i=0;i<productosAPI.length;i++){
+    const precD=calcularDepreciacionNIIF(productosAPI[i].precioInicial,productosAPI[i].precioFinal,productosAPI[i].vidaUtil,productosAPI[i].periodo_consultado);
+    var precioDolar=await fetch("https://misiontic2022upb.vercel.app/api/logistics/to-dolar-converter/"+precD);
+    let respuesta=await precioDolar.json();
+    productoDepreciado.push(respuesta);
+  }
+  for(i=0;i<productosAPI.length;i++){
+    productosConDepreciacion.push({precioDepreciadoEnDolares:productoDepreciado[i],
+    precioInicial:productosAPI[i].precioInicial,precioFinal:productosAPI[i].precioFinal,
+    vidaUtil:productosAPI[i].vidaUtil,periodo_consultado:productosAPI[i].periodo_consultado});
+  }
+  //console.log(productosConDepreciacion);
+  return productosConDepreciacion;
+}
+async function mostrarProductoMayor(){
+  let response = await fetch("https://misiontic2022upb.vercel.app/api/logistics/products");
+  let productosConDepreciacion=await mostrarProductos().then();
+  let depreciacion=new Array();
+  let productoMayorDepreciacion=new Array();
+  for(i=0;i<productosConDepreciacion.length;i++){
+    depreciacion.push(productosConDepreciacion[i].precioDepreciado);
+  };
+  let mayorDepreciacion=Math.max.apply(null,depreciacion);
+  for(i=0;i<productosConDepreciacion.length;i++){
+    if(productosConDepreciacion[i].precioDepreciado==mayorDepreciacion){
+      productoMayorDepreciacion.push(productosConDepreciacion[i]);
     }
-    for(i=0;i<productosAPI.length;i++){
-        productosConDepreciacion.push({precioDepreciadoEnDolares:productoDepreciado[i],
-            precioInicial:productosAPI[i].precioInicial,precioFinal:productosAPI[i].precioFinal,
-            vidaUtil:productosAPI[i].vidaUtil,periodo_consultado:productosAPI[i].periodo_consultado});
-    }
-    //console.log(productosConDepreciacion);
-    return productosConDepreciacion;
-}*/
-
-var products=[
+    else{
+      continue;
+    };
+  };
+  //console.log(productoMayorDepreciacion);
+  return productoMayorDepreciacion;
+}
+/*var products=[
   {
       "id":1,
       "nombre": "Nevera",
@@ -132,16 +151,17 @@ app.use(express.json());
 app.get("/api/logistics/products",(req,res)=>{
   res.json(products);
 });
-
 app.post("/api/logistics/products",(req,res)=>{
   console.log(req.body);
   products.push(req.body);
   res.json(products);
-});
+});*/
+module.exports.calcularDepreciacionNIIF = calcularDepreciacionNIIF;
+module.exports.calcularDepreciacionNIIFEnDolares = calcularDepreciacionNIIFEnDolares;
+module.exports.mostrarProductos = mostrarProductos;
+module.exports.mostrarProductosPrecioDolares = mostrarProductosPrecioDolares;
+module.exports.mostrarProductoMayor = mostrarProductoMayor;
+//module.exports.app=app;
+//mostrarProductoMayor();
 
-//module.exports.calcularDepreciacionNIIF = calcularDepreciacionNIIF;
-//module.exports.calcularDepreciacionNIIFEnDolares = calcularDepreciacionNIIFEnDolares;
-//module.exports.mostrarProductos = mostrarProductos;
-//module.exports.mostrarProductosPrecioDolares = mostrarProductosPrecioDolares;
-module.exports=app;
 
